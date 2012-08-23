@@ -1,5 +1,17 @@
 class MoviesController < ApplicationController
+  include MoviesHelper
 
+  def similar
+    id = params[:id]
+    @movie = Movie.find_by_id(id)
+    begin
+      @results = Movie.find_by_director(@movie.director)
+      rescue Movie::MissingDirectorError 
+      flash[:warning] = "'#{@movie.title}' has no director info"
+      redirect_to movies_path
+    end
+
+  end
   def show
     id = params[:id] # retrieve movie ID from URI route
     @movie = Movie.find(id) # look up movie by unique ID
